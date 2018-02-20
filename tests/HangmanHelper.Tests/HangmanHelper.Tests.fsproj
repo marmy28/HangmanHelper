@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HangmanHelper\HangmanHelper.fsproj" />
+    <ProjectReference Include="../../src/HangmanHelper/HangmanHelper.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

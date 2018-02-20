@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "HangmanHelper", "HangmanHelper\HangmanHelper.fsproj", "{4F0200AB-C7C5-4D7C-A82C-E72B1F433065}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "HangmanHelper", "src/HangmanHelper/HangmanHelper.fsproj", "{4F0200AB-C7C5-4D7C-A82C-E72B1F433065}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "HangmanHelper.Tests", "HangmanHelper.Tests\HangmanHelper.Tests.fsproj", "{8315F03C-DFF6-4325-B493-81B0D65E319E}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "HangmanHelper.Tests", "tests/HangmanHelper.Tests/HangmanHelper.Tests.fsproj", "{8315F03C-DFF6-4325-B493-81B0D65E319E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
