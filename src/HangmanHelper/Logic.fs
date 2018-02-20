@@ -5,9 +5,24 @@ open System.Text.RegularExpressions
 open HangmanHelper.Strings
 open System
 
+
+///**Description**
+/// Gets a string full of periods to start off.
+///**Parameters**
+///  * `number` - parameter of type `int`. The length of the word.
+///**Output Type**
+///  * `string` - The length of the word in periods.
 let getStartingString number = 
     Seq.replicate number '.' |> String.Concat
 
+
+///**Description**
+/// Getting the distinct letters from two strings excluding periods.
+///**Parameters**
+///  * `s1` - parameter of type `seq<char>`. The first string.
+///  * `s2` - parameter of type `seq<char>`. The second string.
+///**Output Type**
+///  * `string` - a distinct list of characters.
 let distinctLetters s1 s2 =
     s1
     |> Seq.append s2
@@ -21,15 +36,15 @@ let getRegexFormat known alreadyUsed =
         match alreadyUsed with
         | "" -> "."
         | x -> "[^" + x + "]"
-    let getCorrectCharacter c =
-        match c with
+    let getCorrectCharacter =
+        function
         | '.' -> replacePeriodString
         | x -> Convert.ToString x
     known 
     |> Seq.map getCorrectCharacter
     |> System.String.Concat
 
-let readLines path = File.ReadLines(path)
+let readLines = File.ReadLines
 
 let isMatch pattern input = Regex.IsMatch(input, pattern)
 
@@ -44,8 +59,7 @@ let mostCommonLetters alreadyUsed lineCollection =
     lineCollection
     |> Seq.concat
     |> Seq.where (alreadyGuessed >> not)
-    |> Seq.groupBy id
-    |> Seq.map (fun (key, group) -> (key, Seq.length group))
+    |> Seq.countBy id
     |> Seq.sortByDescending snd
 
 let getTopThreeMostCommonLetters alreadyUsed lineCollection =
@@ -60,7 +74,7 @@ let groupAndSort lineCollection =
 
 let groupOutput (key, group) =
     let format (index, item) =
-        match index % 6 with
+        match index % 3 with
         | 0 -> sprintf " %s\n" item
         | _ -> sprintf " %s" item
 

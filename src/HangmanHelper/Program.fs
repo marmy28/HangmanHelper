@@ -4,7 +4,7 @@ open HangmanHelper.Logic
 open HangmanHelper.Strings
 open System
 
-let wordFileName = "Properties\words_alpha.txt"
+let wordFileName = "Properties/words_alpha.txt"
 
 type UserInput = Yes = 'Y' | No ='N'
 type InputResult<'a> = | Correct of 'a | Wrong of string
@@ -38,8 +38,8 @@ let matchGuessedCharacter default' alreadyGuessed input =
     | (true, char) -> isAlreadyInGuessed char
     | _ -> Wrong("Expect a character.")
 
-let tryCombine t =
-    match t with
+let tryCombine =
+    function
     | ('.', '.') -> Some('.')
     | ('.', x) -> Some(x)
     | (x, '.') -> Some(x)
@@ -66,6 +66,7 @@ let matchKnown known input =
             Correct(combinedString |> Seq.choose id |> System.String.Concat)
 
     match (sameStart tilda input, sameEnd tilda input, sameLength known input) with
+    | (true, true, _) -> Wrong("Cannot start and end with '~'.")
     | (true, _, _) -> compareFull known (removeFromBeginningTildaAndGetProperLength (String.length known) input)
     | (_, true, _) -> compareFull known (removeFromEndingTildaAndGetProperLength (String.length known) input)
     | (_, _, true) -> compareFull known input
@@ -83,7 +84,7 @@ let rec mainLoop currentlyKnown alreadyGuessedLetters previouslyMatchedLineColle
     printfn "See words? [y/N]"
     let wantToSeeWords = transformInput (matchYesOrNo UserInput.No)
     match wantToSeeWords with
-    | UserInput.Yes -> previouslyMatchedLineCollection |> groupAndSort |> Seq.iter (fun x -> printf "%s" (groupOutput x)) |> ignore
+    | UserInput.Yes -> previouslyMatchedLineCollection |> groupAndSort |> Seq.iter (groupOutput >> printf "%s") |> ignore
     | _ -> ()
 
     let mostLikelyLetter = previouslyMatchedLineCollection |> getTopThreeMostCommonLetters alreadyGuessedLetters |> Seq.head |> fst
@@ -101,7 +102,7 @@ let rec mainLoop currentlyKnown alreadyGuessedLetters previouslyMatchedLineColle
 
     match matchedLineCollection with
     | [] -> printf "No more suggestions"
-    | x::[] -> printf "Only '%s' is left" x
+    | [x] -> printf "Only '%s' is left" x
     | _ -> printf "Continue? [Y/n]"
            let wantsToContinue = transformInput (matchYesOrNo UserInput.Yes)
            match wantsToContinue with
