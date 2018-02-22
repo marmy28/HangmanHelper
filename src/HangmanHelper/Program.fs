@@ -4,11 +4,22 @@ open HangmanHelper.Logic
 open HangmanHelper.Strings
 open System
 
+///**Description**
+/// The file name.
+///**Output Type**
+///  * `string` - the file name.
 let wordFileName = "Properties/words_alpha.txt"
 
 type UserInput = Yes = 'Y' | No ='N'
 type InputResult<'a> = | Correct of 'a | Wrong of string
 
+///**Description**
+/// Transform the user input into what is expected.
+/// The call will happen until the user enters the correct input.
+///**Parameters**
+///  * `func` - parameter of type `string -> InputResult<'a>`. The function to verify user input.
+///**Output Type**
+///  * `'a` - The user input in the correct format.
 let rec transformInput func =
     let input = Console.ReadLine()
     match func input with
