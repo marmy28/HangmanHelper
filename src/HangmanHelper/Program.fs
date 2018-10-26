@@ -11,43 +11,42 @@ open System
 let wordFileName = "Properties/words_alpha.txt"
 
 type UserInput = Yes = 'Y' | No ='N'
-type InputResult<'a> = | Correct of 'a | Wrong of string
 
 ///**Description**
 /// Transform the user input into what is expected.
 /// The call will happen until the user enters the correct input.
 ///**Parameters**
-///  * `func` - parameter of type `string -> InputResult<'a>`. The function to verify user input.
+///  * `func` - parameter of type `string -> Result<'a,string>`. The function to verify user input.
 ///**Output Type**
 ///  * `'a` - The user input in the correct format.
 let rec transformInput func =
     let input = Console.ReadLine()
     match func input with
-    | Correct x -> x
-    | Wrong reason -> printfn "Please give proper input. %s" reason
-                      transformInput func
+    | Result.Ok x -> x
+    | Result.Error reason -> printfn "Please give proper input. %s" reason
+                             transformInput func
 
 let matchInteger input =
     match System.Int32.TryParse input with
-    | (true, number) -> Correct(number)
-    | _ -> Wrong("Expect a number.")
+    | (true, number) -> Result.Ok number
+    | _ -> Result.Error "Expect a number."
 
 let matchYesOrNo default' input =
     match uppercase input with
-    | "Y" -> Correct(UserInput.Yes)
-    | "N" -> Correct(UserInput.No)
-    | "" -> Correct(default')
-    | _ -> Wrong("Expect Y or N.")
+    | "Y" -> Result.Ok UserInput.Yes
+    | "N" -> Result.Ok UserInput.No
+    | "" -> Result.Ok default'
+    | _ -> Result.Error "Expect Y or N."
 
 let matchGuessedCharacter default' alreadyGuessed input =
     let isAlreadyInGuessed c =
         match alreadyGuessed |> Seq.contains c with
-        | true -> Wrong("Already guessed that letter.")
-        | false -> Correct(c)
+        | true -> Result.Error "Already guessed that letter."
+        | false -> Result.Ok c
     match input |> trim |> System.Char.TryParse with
-    | _ when (trim input) = "" -> Correct(default')
+    | _ when (trim input) = "" -> Result.Ok default'
     | (true, char) -> isAlreadyInGuessed char
-    | _ -> Wrong("Expect a character.")
+    | _ -> Result.Error "Expect a character."
 
 let tryCombine =
     function
@@ -72,16 +71,16 @@ let matchKnown known input =
     let compareFull known input =
         let combinedString = Seq.zip known input |> Seq.map tryCombine
         if (combinedString |> Seq.exists (fun x -> x.IsNone)) then
-            Wrong("The already known input does not match the current input")
+            Result.Error ("The already known input does not match the current input")
         else
-            Correct(combinedString |> Seq.choose id |> System.String.Concat)
+            Result.Ok (combinedString |> Seq.choose id |> System.String.Concat)
 
     match (sameStart tilda input, sameEnd tilda input, sameLength known input) with
-    | (true, true, _) -> Wrong("Cannot start and end with '~'.")
+    | (true, true, _) -> Result.Error ("Cannot start and end with '~'.")
     | (true, _, _) -> compareFull known (removeFromBeginningTildaAndGetProperLength (String.length known) input)
     | (_, true, _) -> compareFull known (removeFromEndingTildaAndGetProperLength (String.length known) input)
     | (_, _, true) -> compareFull known input
-    | (_, _, _) -> Wrong("Does not meet requirements. Use '~' at either the beginning or end to shorten the word.")
+    | (_, _, _) -> Result.Error ("Does not meet requirements. Use '~' at either the beginning or end to shorten the word.")
 
 
 let getNewKnown known =
