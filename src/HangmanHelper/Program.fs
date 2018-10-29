@@ -113,11 +113,7 @@ let rec mainLoop currentlyKnown alreadyGuessedLetters previouslyMatchedLineColle
     match matchedLineCollection with
     | [] -> printf "No more suggestions"
     | [x] -> printf "Only '%s' is left" x
-    | _ -> printf "Continue? [Y/n]"
-           let wantsToContinue = transformInput (matchYesOrNo UserInput.Yes)
-           match wantsToContinue with
-           | UserInput.Yes -> mainLoop newKnown guessed matchedLineCollection
-           | _ -> printf "Have a good day!"
+    | _ -> mainLoop newKnown guessed matchedLineCollection
 
 [<EntryPoint>]
 let main _ =
