@@ -39,3 +39,8 @@ let sameStart s = Seq.forall2 (=) s
 ///**Output Type**
 ///  * `seq<'a> -> bool` - A function that checks the end of the other string.
 let sameEnd s = Seq.rev >> (s |> Seq.rev |> sameStart)
+
+let containing s1 s2 =
+    let set1 = s1 |> Set.ofSeq
+    let set2 = s2 |> Set.ofSeq
+    (Set.isSuperset set1 set2) || (Set.isSubset set1 set2)
