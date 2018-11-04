@@ -61,6 +61,12 @@ let removeFromBeginningTildaAndGetProperLength l s =
     let tail = s |> Seq.tail
     Seq.append (Seq.replicate (l - sLength) '.') tail
 
+let removeFromMiddleTildaAndGetProperLength l s =
+    let sLength = (String.length s) - 1
+    let init = s |> Seq.takeWhile ((<>) '~')
+    let tail = s |> Seq.rev |> Seq.takeWhile ((<>) '~') |> Seq.rev
+    Seq.append (Seq.replicate (l - sLength) '.') tail |> Seq.append init
+
 let removeFromEndingTildaAndGetProperLength l s =
     let sLength = (String.length s) - 1
     let init = s |> Seq.take sLength
@@ -75,16 +81,16 @@ let matchKnown known input =
         else
             Result.Ok (combinedString |> Seq.choose id |> System.String.Concat)
 
-    match (sameStart tilda input, sameEnd tilda input, sameLength known input) with
-    | (true, true, _) -> Result.Error ("Cannot start and end with '~'.")
-    | (true, _, _) -> compareFull known (removeFromBeginningTildaAndGetProperLength (String.length known) input)
-    | (_, true, _) -> compareFull known (removeFromEndingTildaAndGetProperLength (String.length known) input)
-    | (_, _, true) -> compareFull known input
-    | (_, _, _) -> Result.Error ("Does not meet requirements. Use '~' at either the beginning or end to shorten the word.")
-
+    let numberOfTildas = input |> Seq.where (fun i -> i = '~') |> Seq.length
+    match (numberOfTildas, sameLength known input) with
+    | (0, true) -> compareFull known input
+    | (1, _) when sameStart tilda input -> compareFull known (removeFromBeginningTildaAndGetProperLength (String.length known) input)
+    | (1, _) when sameEnd tilda input -> compareFull known (removeFromEndingTildaAndGetProperLength (String.length known) input)
+    | (1, _) -> compareFull known (removeFromMiddleTildaAndGetProperLength (String.length known) input)
+    | _ -> Result.Error ("Does not meet requirements. Use '~' at either the beginning, middle, or end to shorten the word.")
 
 let getNewKnown known =
-    printfn "To what did it change? (Use '~' at the beginning or ending to shorten the word if you want.)"
+    printfn "To what did it change? (Use '~' at the beginning, middle, or ending to shorten the word if you want.)"
     transformInput (matchKnown known)
 
 let rec mainLoop currentlyKnown alreadyGuessedLetters previouslyMatchedLineCollection =
